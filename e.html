@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Games</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    h1 {
+      color: #009688;
+    }
+
+    p {
+      color: #555;
+    }
+
+    input {
+      padding: 5px;
+    }
+
+    button {
+      padding: 8px;
+      background-color: #009688;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    #result {
+      font-weight: bold;
+      margin-top: 10px;
+      color: #ff5722;
+      opacity: 0; /* Initially hidden */
+      transition: opacity 1s ease-in-out;
+    }
+
+    #welcome {
+      margin-bottom: 30px;
+    }
+
+    #layouts {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .layout {
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      text-align: left;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Coin Flip Animation */
+    @keyframes flip {
+      0% {
+        transform: rotateY(0deg);
+      }
+      50% {
+        transform: rotateY(180deg);
+      }
+      100% {
+        transform: rotateY(360deg);
+      }
+    }
+
+    .coin {
+      display: inline-block;
+      font-size: 24px;
+      margin-top: 10px;
+      animation: flip 1s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="welcome">
+    <h1>Welcome to Simple Games!</h1>
+    <p>Choose a game from the options below:</p>
+  </div>
+
+  <div id="layouts">
+    <div class="layout" id="numberGuessingLayout">
+      <h2>Number Guessing Game</h2>
+      <p>Guess a number between 1 and 10:</p>
+      <input type="number" id="userGuess" min="1" max="10">
+      <button onclick="checkGuess()">Submit Guess</button>
+      <p id="result"></p>
+    </div>
+
+    <div class="layout" id="rockPaperScissorsLayout">
+      <h2>Rock, Paper, Scissors Game</h2>
+      <p>Select your move:</p>
+      <button onclick="playGame('rock')">Rock</button>
+      <button onclick="playGame('paper')">Paper</button>
+      <button onclick="playGame('scissors')">Scissors</button>
+      <p id="rpsResult" class="fade-in"></p>
+    </div>
+
+    <div class="layout" id="coinFlipLayout">
+      <h2>Coin Flip Game</h2>
+      <button onclick="flipCoin()">Flip Coin</button>
+      <p id="coinResult" class="coin"></p>
+    </div>
+
+    <!-- Add more game layouts here if needed -->
+
+  </div>
+
+  <script>
+    // Number Guessing Game
+    let secretNumber = generateRandomNumber();
+
+    function generateRandomNumber() {
+      return Math.floor(Math.random() * 10) + 1;
+    }
+
+    function checkGuess() {
+      const userGuess = parseInt(document.getElementById("userGuess").value);
+
+      if (isNaN(userGuess) || userGuess < 1 || userGuess > 10) {
+        alert("Please enter a valid number between 1 and 10.");
+        return;
+      }
+
+      if (userGuess === secretNumber) {
+        document.getElementById("result").innerHTML = "Congratulations! You guessed the correct number!";
+      } else {
+        document.getElementById("result").innerHTML = `Wrong guess. The correct number was ${secretNumber}.`;
+      }
+
+      // Auto reset after 4 seconds
+      setTimeout(resetGame, 4000);
+    }
+
+    function resetGame() {
+      secretNumber = generateRandomNumber();
+      document.getElementById("userGuess").value = "";
+      document.getElementById("result").innerHTML = "";
+    }
+
+    // Rock, Paper, Scissors Game
+    let playerMove;
+
+    function playGame(move) {
+      playerMove = move;
+      const moves = ['rock', 'paper', 'scissors'];
+      const computerMove = moves[Math.floor(Math.random() * moves.length)];
+
+      const resultElement = document.getElementById("rpsResult");
+
+      if (playerMove === computerMove) {
+        resultElement.innerHTML = "It's a tie!";
+      } else if (
+        (playerMove === 'rock' && computerMove === 'scissors') ||
+        (playerMove === 'paper' && computerMove === 'rock') ||
+        (playerMove === 'scissors' && computerMove === 'paper')
+      ) {
+        resultElement.innerHTML = `You win! ${playerMove} beats ${computerMove}.`;
+      } else {
+        resultElement.innerHTML = `You lose! ${computerMove} beats ${playerMove}.`;
+      }
+
+      // Apply fade-in animation
+      resultElement.style.opacity = 1;
+
+      // Auto reset after 4 seconds
+      setTimeout(resetRPS, 4000);
+    }
+
+    function resetRPS() {
+      const resultElement = document.getElementById("rpsResult");
+      // Reset opacity and hide result
+      resultElement.style.opacity = 0;
+      resultElement.innerHTML = "";
+      playerMove = null;
+    }
+
+    // Coin Flip Game
+    function flipCoin() {
+      const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
+      document.getElementById("coinResult").innerHTML = result;
+
+      // Remove animation class to replay the animation on each flip
+      const coinElement = document.getElementById("coinResult");
+      coinElement.classList.remove("coin");
+      void coinElement.offsetWidth; // Trigger reflow to restart animation
+      coinElement.classList.add("coin");
+
+      // Auto reset after 4 seconds
+      setTimeout(resetCoinFlip, 4000);
+    }
+
+    function resetCoinFlip() {
+      document.getElementById("coinResult").innerHTML = "";
+    }
+  </script>
+</body>
+</html>
